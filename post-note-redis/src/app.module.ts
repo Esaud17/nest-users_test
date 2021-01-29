@@ -1,6 +1,6 @@
-import { ConfigDefaultModule } from '../config/enviroment.properties.setting';
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
+import { ConfigDefaultModule } from '../config/enviroment.properties.setting';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MONSGOOSEPROPERTIES } from 'config/mongoose.properties.setting';
 
