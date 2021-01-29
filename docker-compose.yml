@@ -1,0 +1,65 @@
+version: '3.3'
+
+services:
+    api_redis:
+        build:
+            context: ./post.note.redis
+        image: post-note-redis
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        command: npm run start:dev
+        environment: 
+            MONGODB_URI: mongodb://app2021:pw2021v1@mongo/tododb
+            REDIS_URI: redis://redis:6379
+        depends_on:
+            - redis
+            - mongo
+    api_rest:
+        build:   
+            context: ./post.note.rest
+        image: post-note-rest
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        #ports:
+        #    - 3000:3000
+        command: npm run start:dev
+        environment: 
+            REDIS_URI: redis://redis:6379
+        depends_on:
+            - redis
+    nginx:
+        build:
+            context: ./post.note.nginx
+        volumes:
+            - ./:/home/node/app
+        restart: always
+        ports:
+            - 80:80
+        depends_on:
+            - api_rest
+    redis:
+        image: bitnami/redis
+        environment:
+            - ALLOW_EMPTY_PASSWORD=yes
+        volumes:
+            - redis-data:/bitnami/redis/data
+    nats:
+        image: bitnami/nats:latest
+        ports:
+            - 4222:4222
+            - 6222:6222
+            - 8222:8222
+    mongo:
+        image: bitnami/mongodb:4.4.1
+        environment:
+            MONGODB_ROOT_PASSWORD: pw2021
+            MONGODB_USERNAME: app2021
+            MONGODB_PASSWORD: pw2021v1
+            MONGODB_DATABASE: tododb
+        volumes:
+            - 'mongo-data:/bitnami/mongodb/data'
+volumes:
+    mongo-data:
+    redis-data:
